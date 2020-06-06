@@ -1,0 +1,54 @@
+<!--snippet: clase en php, con un metodo para conectar, otro para realizar un select y por último uno para insertar un registro) -->
+<!--programado:  Gabriel Fernández B. -->
+<!--Email: gabriel@zeitzit.online -->
+
+
+
+<?php
+class conexion{
+ // Se extraen los datos de conexion, con parse_ini_file y se hace la referencia hacia la constante credenciales
+    public function conectar(){
+        $this->credenciales=parse_ini_file("config.php.ini");
+        $conexion=mysqli_connect($this->credenciales['host'],
+                                $this->credenciales['usuario'],
+                                $this->credenciales['clave'],
+                                $this->credenciales['dbnombre']);
+        if ($conexion->connect_error)
+        die('conexion erronea');
+        return $conexion;
+        }
+}    
+
+class consulta{
+        
+        var $consulta;
+        var $resultado;
+        // se crea un objeto conexion en el constructor
+        public function __construct(){
+            $this->conexion=new conexion();
+            }
+
+        public function select($sentenciaSQL){
+            
+            $var1=$this->conexion->conectar();
+            $this->consulta=mysqli_query($var1,$sentenciaSQL);
+            
+            $this->resultado=mysqli_fetch_array($this->consulta);
+            $row=$this->resultado;
+            echo $row['nombre']."-".$row['telefono']."-".$row['ubicacion'];
+            mysqli_close($var1);
+ 
+            }
+        public function insertar($sentenciaSQL){
+            $var1=$this->conexion->conectar();
+            $this->consulta=mysqli_query($var1,$sentenciaSQL);
+            }
+}
+
+
+$consulta1=new consulta();
+$consulta1->select("select * from proveedores");
+$consulta1->insertar("insert into proveedores (id,nombre,telefono,ubicacion) 
+                  values('$_REQUEST[id]','$_REQUEST[nombre]','$_REQUEST[telefono]','$_REQUEST[ubicacion]')");
+  
+?>
